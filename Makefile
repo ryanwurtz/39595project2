@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-std=c++17 -Wall -g
-FILES = hash_list.cpp hash_list.h hash_map.cpp hash_map.h
+FILES = hash_list.cpp hash_list.h hash_map.cpp hash_map.h main.cpp
 
 # The source files we use for building custom_tests
 ALL_SRC=$(wildcard *.cpp)

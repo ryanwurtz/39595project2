@@ -3,13 +3,13 @@
 hash_map::hash_map(size_t capacity) {
     _size = 0;
     _capacity = capacity;
-    _head[int(_capacity)];
+    _head = new hash_list[int(_capacity)];
 }
 
 hash_map::hash_map(const hash_map &other) {
-    _size = 0;
-    _capacity = 0;
-    _head[int(_capacity)];
+    _size = other._size;
+    _capacity = other._capacity;
+    _head = new hash_list[(int)_capacity];
 
     for (int i = 0; i < int(_capacity);i++) {
         _head[i] = other._head[i];
@@ -27,13 +27,16 @@ hash_map &hash_map::operator=(const hash_map &other) {
 
 void hash_map::insert(int key, float value) {
     int index = key % int(_capacity);
-    if (index < 0) { index *= -1;}
+    if (index < 0) {index *= -1;}
+    int oldsize = _head[index].get_size();
     _head[index].insert(key,value);
+    if(oldsize != int(_head[index].get_size()))
+        _size++;
 }
 
 std::optional<float> hash_map::get_value(int key) const {
     for (int i = 0;i < int(_capacity);i++) {
-        node *ptr = _head[i].head;
+        node *ptr = _head[i].get_head();
         while (ptr != NULL) {
             if (ptr->key == key){
                 std::optional<float> val = ptr->value;
@@ -41,7 +44,6 @@ std::optional<float> hash_map::get_value(int key) const {
             } 
             ptr = ptr->next;
         }
-        i++;
     }
     return std::nullopt;
 }
@@ -50,6 +52,10 @@ bool hash_map::remove(int key) {
     bool keyv = false;
     for (int i = 0;i < int(_capacity);i++) {
         keyv = _head[i].remove(key); 
+        if (keyv) {
+            _size--;
+            return keyv;
+        }
     }
     return keyv;
 }
@@ -65,7 +71,7 @@ size_t hash_map::get_capacity() const {
 void hash_map::get_all_keys(int *keys) {
     int j = 0;
     for (int i = 0;i < int(_capacity);i++) {
-        node *ptr = _head[i].head;
+        node *ptr = _head[i].get_head();
         while (ptr != NULL) {
             keys[j] = ptr->key;
             ptr = ptr->next;
@@ -80,3 +86,6 @@ void hash_map::get_bucket_sizes(size_t *buckets) {
     }
 }
 
+hash_map::~hash_map() {
+    delete[] _head;
+}
